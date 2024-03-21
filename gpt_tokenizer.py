@@ -1,0 +1,56 @@
+######### INCOMPLETE
+
+class GPT_tokenizer:
+    def __init__(self, vocab_size=276):
+        self.vocab_size = vocab_size # final desired vocab size
+        self.num_original_tokens = 256 # 256 is original vocab size, which is 0-255 (a byte)
+        self.num_merges = vocab_size - self.num_original_tokens 
+
+    def get_encoding(self, text):
+        """
+        Converts text to utf-8 encoding and then to integer values(0-255)
+        """
+        tokens = text.encode('utf-8')
+        tokens = list(map(int, tokens))
+        return tokens
+    
+    def get_most_frequent_pair(self, tokens):
+        """
+        Returns pair with highest occurences
+        """
+        counts = {}
+        for pair in zip(tokens, tokens[1:]):
+            counts[pair] = counts.get(pair, 0) + 1
+
+        pair = max(counts, key=counts.get)        
+        return pair
+    
+    def merge(self, tokens, pair, new_token):
+        """
+        Replace pair occurences in tokens with new_token
+        """
+        for idx, p in enumerate(zip(tokens, tokens[1:])):
+            if p==pair:
+                tokens[idx]=new_token
+                tokens[idx+1]=-1
+
+        tokens = [i for i in tokens if i!=-1]
+        return tokens
+
+    def tokenize(self, text):
+        original_tokens = self.get_encoding(text)
+        tokens = original_tokens.copy()
+        self.merge_record = {}
+        for i in range(self.num_merges):
+            new_token = self.num_original_tokens + i
+            pair = self.get_most_frequent_pair(tokens)
+            print(f"Merging {pair} into a new token {new_token}")
+            tokens = self.merge(tokens, pair, new_token)
+            self.merge_record[pair] = new_token
+        return tokens
+
+if __name__=="__main__":
+    tokenizer = GPT_tokenizer()
+    text = "💡 Illuminate your path with 𝓌𝒾𝓈𝒹𝑜𝓂 and insight, 💡 guiding you towards 𝕘𝕣𝕖𝕒𝕥𝕟𝕖𝕤𝕤. 🌟🔮 🌈 Let your imagination soar beyond the stars 🚀 as you embrace the journey of 𝓭𝓲𝓼𝓬𝓸𝓿𝓮𝓻𝔂 and creativity. 🌟💫"
+    print(tokenizer.tokenize(text))
+  
