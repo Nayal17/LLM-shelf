@@ -48,9 +48,29 @@ class GPT_tokenizer:
             tokens = self.merge(tokens, pair, new_token)
             self.merge_record[pair] = new_token
         return tokens
+    
+    def decode(self, tokens):
+        self.merge_record = {v:k for k,v in self.merge_record.items()}
+        idx=0
+        while(idx!=len(tokens)-1):
+            token = tokens[idx]
+            if token in self.merge_record.keys():
+                pair = self.merge_record[token]
+                tokens[idx] = pair[0]
+                tokens.insert(idx+1, pair[1])
+
+            else:
+                idx=idx+1
+
+        bytes_encoded = bytes(tokens)
+        text = bytes_encoded.decode("utf-8") 
+        return text
 
 if __name__=="__main__":
     tokenizer = GPT_tokenizer()
     text = "💡 Illuminate your path with 𝓌𝒾𝓈𝒹𝑜𝓂 and insight, 💡 guiding you towards 𝕘𝕣𝕖𝕒𝕥𝕟𝕖𝕤𝕤. 🌟🔮 🌈 Let your imagination soar beyond the stars 🚀 as you embrace the journey of 𝓭𝓲𝓼𝓬𝓸𝓿𝓮𝓻𝔂 and creativity. 🌟💫"
-    print(tokenizer.tokenize(text))
+    tokenized_text = tokenizer.tokenize(text)
+    decoded_text = tokenizer.decode(tokenized_text)
+    print(decoded_text)
+
   
