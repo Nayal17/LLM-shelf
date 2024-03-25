@@ -5,6 +5,7 @@ class GPT_tokenizer:
         self.vocab_size = vocab_size # final desired vocab size
         self.num_original_tokens = 256 # 256 is original vocab size, which is 0-255 (a byte)
         self.num_merges = vocab_size - self.num_original_tokens 
+        self.merge_record = None
 
     def get_encoding(self, text):
         """
@@ -50,17 +51,20 @@ class GPT_tokenizer:
         return tokens
     
     def decode(self, tokens):
-        self.merge_record = {v:k for k,v in self.merge_record.items()}
-        idx=0
-        while(idx!=len(tokens)-1):
-            token = tokens[idx]
-            if token in self.merge_record.keys():
-                pair = self.merge_record[token]
-                tokens[idx] = pair[0]
-                tokens.insert(idx+1, pair[1])
+        if self.merge_record is not None:
+            self.merge_record = {v:k for k,v in self.merge_record.items()}
+            idx=0
+            while(idx!=len(tokens)-1):
+                token = tokens[idx]
+                if token in self.merge_record.keys():
+                    pair = self.merge_record[token]
+                    tokens[idx] = pair[0]
+                    tokens.insert(idx+1, pair[1])
 
-            else:
-                idx=idx+1
+                else:
+                    idx=idx+1
+        else:
+            pass
 
         bytes_encoded = bytes(tokens)
         text = bytes_encoded.decode("utf-8", errors="replace") 
