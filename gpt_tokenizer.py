@@ -63,7 +63,7 @@ class GPT_tokenizer:
                 idx=idx+1
 
         bytes_encoded = bytes(tokens)
-        text = bytes_encoded.decode("utf-8") 
+        text = bytes_encoded.decode("utf-8", errors="replace") 
         return text
 
 if __name__=="__main__":
