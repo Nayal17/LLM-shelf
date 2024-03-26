@@ -7,7 +7,7 @@ class GPT_tokenizer:
         self.num_merges = vocab_size - self.num_original_tokens 
         self.merge_record = None
 
-    def get_encoding(self, text):
+    def get_utf_encoding(self, text):
         """
         Converts text to utf-8 encoding and then to integer values(0-255)
         """
@@ -38,8 +38,8 @@ class GPT_tokenizer:
         tokens = [i for i in tokens if i!=-1]
         return tokens
 
-    def tokenize(self, text):
-        original_tokens = self.get_encoding(text)
+    def encode(self, text):
+        original_tokens = self.get_utf_encoding(text)
         tokens = original_tokens.copy()
         self.merge_record = {}
         for i in range(self.num_merges):
@@ -73,7 +73,9 @@ class GPT_tokenizer:
 if __name__=="__main__":
     tokenizer = GPT_tokenizer()
     text = "💡 Illuminate your path with 𝓌𝒾𝓈𝒹𝑜𝓂 and insight, 💡 guiding you towards 𝕘𝕣𝕖𝕒𝕥𝕟𝕖𝕤𝕤. 🌟🔮 🌈 Let your imagination soar beyond the stars 🚀 as you embrace the journey of 𝓭𝓲𝓼𝓬𝓸𝓿𝓮𝓻𝔂 and creativity. 🌟💫"
-    tokenized_text = tokenizer.tokenize(text)
+    tokenized_text = tokenizer.encode(text)
+    non_existing_token = tokenizer.decode([128])
+    print(non_existing_token)
     decoded_text = tokenizer.decode(tokenized_text)
     print(decoded_text)
 
