@@ -48,11 +48,12 @@ class GPT_tokenizer:
             print(f"Merging {pair} into a new token {new_token}")
             tokens = self.merge(tokens, pair, new_token)
             self.merge_record[pair] = new_token
+
+        self.merge_record = {v:k for k,v in self.merge_record.items()} # lookup dictionary for decoding
         return tokens
     
     def decode(self, tokens):
-        if self.merge_record is not None:
-            self.merge_record = {v:k for k,v in self.merge_record.items()}
+        if bool(self.merge_record):
             idx=0
             while(idx!=len(tokens)-1):
                 token = tokens[idx]
@@ -65,7 +66,7 @@ class GPT_tokenizer:
                     idx=idx+1
         else:
             pass
-
+        
         bytes_encoded = bytes(tokens)
         text = bytes_encoded.decode("utf-8", errors="replace") 
         return text
@@ -78,5 +79,4 @@ if __name__=="__main__":
     print(non_existing_token)
     decoded_text = tokenizer.decode(tokenized_text)
     print(decoded_text)
-
   
