@@ -1,4 +1,5 @@
 ######### INCOMPLETE
+import regex as re
 
 class GPT_tokenizer:
     def __init__(self, vocab_size=276):
@@ -7,13 +8,16 @@ class GPT_tokenizer:
         self.num_merges = vocab_size - self.num_original_tokens 
         self.merge_record = None
 
-    def get_utf_encoding(self, text):
+    def get_utf_encoding(self, split_list):
         """
         Converts text to utf-8 encoding and then to integer values(0-255)
         """
-        tokens = text.encode('utf-8')
-        tokens = list(map(int, tokens))
-        return tokens
+        full_text_tokens = []
+        for subtext in split_list:
+            tokens = subtext.encode('utf-8')
+            tokens = list(map(int, tokens))
+            full_text_tokens.extend(tokens)
+        return full_text_tokens
     
     def get_most_frequent_pair(self, tokens):
         """
@@ -38,8 +42,15 @@ class GPT_tokenizer:
         tokens = [i for i in tokens if i!=-1]
         return tokens
 
+    def gpt_style_split(self, text):
+        gpt2pattern = re.compile(r"""'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
+        split_list = re.findall(gpt2pattern, text)
+        return split_list
+
+
     def encode(self, text):
-        original_tokens = self.get_utf_encoding(text)
+        split_list = self.gpt_style_split(text)
+        original_tokens = self.get_utf_encoding(split_list)
         tokens = original_tokens.copy()
         self.merge_record = {}
         for i in range(self.num_merges):
@@ -79,4 +90,3 @@ if __name__=="__main__":
     print(non_existing_token)
     decoded_text = tokenizer.decode(tokenized_text)
     print(decoded_text)
-  
