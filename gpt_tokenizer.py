@@ -1,4 +1,3 @@
-######### INCOMPLETE
 import regex as re
 
 class GPT_tokenizer:
